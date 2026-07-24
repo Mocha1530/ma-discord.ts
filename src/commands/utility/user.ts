@@ -87,4 +87,5 @@ export const execute = async (interaction: CommandInteraction) => {
     flags: MessageFlags.IsComponentsV2,
     allowedMentions: { parse: [] },
   });
+  return null;
 };

@@ -41,15 +41,17 @@ const getCommands = async () => {
   const commands: { [key: string]: commandModule } = {};
   for (const filePath of commandFiles) {
     try {
-      const module = await import(`file://${filePath}`);
+      const relativePath = path.relative(commandDir, filePath);
+      const module = await import(`../commands/${relativePath}`);
       if (module.register && module.execute) {
         const fileName = path.basename(filePath);
         commands[fileName] = module;
       }
     } catch (error) {
-      continue;
+      console.error(`Failed to load ${filePath}:`, error);
     }
   }
+
   seenCommands = commands;
   return commands;
 };
