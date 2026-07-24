@@ -1,0 +1,22 @@
+name: Register Commands on Vercel Deploy
+
+on:
+  deployment_status:
+    states: [success]
+
+jobs:
+  register:
+    if: github.event.deployment_status.environment == 'production'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+      - uses: npm ci
+      - name: Register Commands
+        run: npm run register
+        env:
+          BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
+          NEXT_PUBLIC_APPLICATION_ID: ${{ secrets.NEXT_PUBLIC_APPLICATION_ID }}
