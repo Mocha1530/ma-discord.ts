@@ -14,21 +14,22 @@ let seenCommands: {
   [key: string]: commandModule;
 } | null = null;
 
-function getAllCommandFiles(dir: string): string[] {
+function getAllCommandFiles(dir: string, baseDir: string): string[] {
   const entries = fs.readdirSync(dir, { withFileTypes: true });
   let files: string[] = [];
 
   for (const entry of entries) {
     const fullPath = path.join(dir, entry.name);
     if (entry.isDirectory()) {
-      files = files.concat(getAllCommandFiles(fullPath));
+      files = files.concat(getAllCommandFiles(fullPath, baseDir));
     } else if (
       (entry.name.endsWith(".ts") || entry.name.endsWith(".js")) &&
       !entry.name.endsWith(".d.ts") &&
       entry.name !== "index.ts" &&
       entry.name !== "index.js"
     ) {
-      files.push(fullPath);
+      const relative = path.relative(baseDir, fullPath);
+      files.push(relative);
     }
   }
   return files;
@@ -37,12 +38,11 @@ function getAllCommandFiles(dir: string): string[] {
 const getCommands = async () => {
   if (seenCommands) return seenCommands;
   const commandDir = path.join(process.cwd(), "src", "commands");
-  const commandFiles = getAllCommandFiles(commandDir);
+  const commandFiles = getAllCommandFiles(commandDir, commandDir);
   const commands: { [key: string]: commandModule } = {};
   for (const filePath of commandFiles) {
     try {
-      const relativePath = path.relative(commandDir, filePath);
-      const module = await import(`../commands/${relativePath}`);
+      const module = await import(`../commands/${filePath}`);
       if (module.register && module.execute) {
         const fileName = path.basename(filePath);
         commands[fileName] = module;
