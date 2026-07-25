@@ -21,9 +21,9 @@ export const register = new SlashCommandBuilder()
 export const execute: executeCommand = async (interaction) => {
   const server_id = interaction.guild_id;
   const bot_id = interaction.application_id;
-  const user = interaction.user ?? interaction.member?.user;
+  const user_id = interaction.user ?? interaction.member?.user.id;
 
-  if (!user) {
+  if (!user_id) {
     return {
       type: 4,
       data: {
@@ -31,6 +31,9 @@ export const execute: executeCommand = async (interaction) => {
       },
     };
   }
+
+  const userRes = await discord_api.get(`/users/${user_id}`);
+  const user = userRes.data;
 
   const member = interaction.member;
   const accountAge = formatAccountAge(snowflakeToDate(user?.id!));
