@@ -8,84 +8,102 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
   ThumbnailBuilder,
-  type CommandInteraction,
-  type GuildMember,
 } from "discord.js";
 import { formatAccountAge } from "@/utils/formatAccountAge";
+import { snowflakeToDate, getBadges } from "@/utils/user-helpers";
+import { executeCommand } from "@/types";
+import { discord_api } from "@/utils/discord-api";
 
 export const register = new SlashCommandBuilder()
   .setName("user")
   .setDescription("Provides information about the user.");
 
-export const execute = async (interaction: CommandInteraction) => {
-  await interaction.deferReply();
-
-  const server_id = interaction.guild!.id;
-  const bot = interaction.guild!.members.me;
-  const user = interaction.user;
-  const member = interaction.member as GuildMember;
+export const execute: executeCommand = async (interaction) => {
+  const server_id = interaction.guild_id;
+  const bot_id = interaction.application_id;
+  const user = interaction.user!;
+  const member = interaction.member;
   // const fullMember = await interaction.guild!.members.fetch(user.id);
-  const badgesArray = user.flags?.toArray() ?? [];
-  const displayBadges =
-    badgesArray.length > 0 ? badgesArray.join(", ") : "_No Badges_";
-  const memberRoles = member.roles.cache;
+  const accountAge = formatAccountAge(snowflakeToDate(user?.id!));
+  const badges = getBadges(user?.flags);
+
+  let roleDisplay = "_No Roles_";
+  if (server_id && member?.roles) {
+    const roleRes = await discord_api.get(`/guilds/${server_id}/roles`);
+    const allRoles = roleRes.data as any[];
+    const roleMap: Record<string, any> = {};
+    for (const r of allRoles) roleMap[r.id] = r;
+
+    const userRoleIds = member.roles as string[];
+    const sortedRoles = userRoleIds
+      .filter((id) => id !== server_id)
+      .map((id) => roleMap[id])
+      .filter(Boolean)
+      .sort((a, b) => a.position - b.position);
+
+    if (sortedRoles.length) {
+      const display = sortedRoles.slice(0, 5);
+      const mentions = display.map((r) => `<@&${r.id}>`);
+      let extra =
+        sortedRoles.length > 5 ? ` and ${sortedRoles.length - 5} more` : "";
+      roleDisplay = mentions.join(", ") + extra;
+    }
+  }
 
   const container = new ContainerBuilder()
     .setAccentColor()
     .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(
-        `-# ${bot?.displayName} • Utility • User`,
-      ),
+      new TextDisplayBuilder().setContent(`-# MeowAni • Utility • User`),
     )
     .addSectionComponents(
       new SectionBuilder()
         .addTextDisplayComponents(
-          new TextDisplayBuilder().setContent(`## ${member?.displayName}`),
-        )
-        .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### User Info\n>>> **Username:** \`${user.username}\`\n**Global Name:** \`${user.globalName}\`\n**User ID:** \`${user.id}\`\n**Account Created:** ${formatAccountAge(user.createdAt)}`,
+            `## ${member?.nick ?? user?.global_name ?? user?.username}`,
           ),
         )
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### Extra\n>>> **Badges:** ${displayBadges}\n**Roles:** ${
-              memberRoles?.size > 0
-                ? memberRoles
-                    .filter((r) => r.id !== r.guild.id)
-                    .sort((a, b) => b.position - a.position)
-                    .map((r) => r.toString())
-                    .slice(0, 5)
-                    .join(", ")
-                : "_No Roles_"
-            }`,
+            `### User Info\n>>> **Username:** \`${user?.username}\`\n**Global Name:** \`${user?.global_name}\`\n**User ID:** \`${user?.id}\`\n**Account Created:** ${accountAge}`,
+          ),
+        )
+        .addTextDisplayComponents(
+          new TextDisplayBuilder().setContent(
+            `### Extra\n>>> **Badges:** ${getBadges.length ? badges.join(", ") : "_No Badges_"}\n**Roles:** ${roleDisplay}`,
           ),
         )
         .setThumbnailAccessory(
           new ThumbnailBuilder()
-            .setURL(member?.avatarURL() ?? user.defaultAvatarURL)
+            .setURL(
+              member?.avatar
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${member.avatar}.${member.avatar.startsWith("a_") ? ".gif" : ".png"}?size=512`
+                : user?.avatar
+                  ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? ".gif" : ".png"}?size=512`
+                  : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user?.id) >> 22n) % 6n}.png?size=512`,
+            )
             .setDescription("User Icon"),
         ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false));
 
-  const bannerUrl = user.bannerURL({ size: 1024 });
-  if (bannerUrl) {
+  if (user.banner) {
     container.addMediaGalleryComponents(
       new MediaGalleryBuilder().addItems(
         new MediaGalleryItemBuilder()
-          .setURL(bannerUrl)
+          .setURL(
+            `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${user.banner.startsWith("a_") ? ".gif" : ".png"}?size=1024`,
+          )
           .setDescription("User Banner"),
       ),
     );
   }
 
-  const components = [container];
-
-  await interaction.reply({
-    components,
-    flags: MessageFlags.IsComponentsV2,
-    allowedMentions: { parse: [] },
-  });
-  return null;
+  return {
+    type: 4,
+    data: {
+      components: [container.toJSON()],
+      flags: MessageFlags.IsComponentsV2,
+      allowed_mentions: { parse: [] },
+    },
+  };
 };

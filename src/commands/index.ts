@@ -5,5 +5,5 @@ import * as user from "./utility/user";
 export const commands = {
   help,
   ping,
-  //user
+  user,
 } satisfies Record<string, { execute: any; register: any }>;
