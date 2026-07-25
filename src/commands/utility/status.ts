@@ -38,13 +38,13 @@ export const execute: executeCommand = async (interaction) => {
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `>>> **Discord API Latency:** \`${apiLatency}ms\`\n**Instance Uptime:** \`${uptimeSeconds}s\`\n**Memory Usage (Process RSS)** \`${rssMB} MB\` used out of \`1024 MB\` limit\n**Heap (Used / Total):** \`${heapUsedMB} MB / ${heapTotalMB} MB\`\n**Host RAM:** \`${hostRamGB} GB\`\n**Server Region:** \`${vercelRegion}\``,
+        `>>> **Discord API Latency:** \`${apiLatency}ms\`\n**Instance Uptime:** \`${uptimeSeconds}s\`\n**Memory Usage (Process RSS):** \`${rssMB} MB\` used out of \`1024 MB\` limit\n**Heap (Used / Total):** \`${heapUsedMB} MB / ${heapTotalMB} MB\`\n**Host RAM:** \`${hostRamGB} GB\`\n**Server Region:** \`${vercelRegion}\``,
       ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `-# Served at ${new Date().toISOString()}`,
+        `-# Served at ${formattedISODate(new Date())}`,
       ),
     );
 

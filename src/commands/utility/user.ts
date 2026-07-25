@@ -63,9 +63,9 @@ export const execute: executeCommand = async (interaction) => {
   }
 
   const container = new ContainerBuilder()
-    .setAccentColor()
+    .setAccentColor(9166826)
     .addTextDisplayComponents(
-      new TextDisplayBuilder().setContent(`-# MeowAni • Utility • User`),
+      new TextDisplayBuilder().setContent("-# MeowAni • Utility • User"),
     )
     .addSectionComponents(
       new SectionBuilder()
