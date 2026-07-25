@@ -21,13 +21,13 @@ export const register = new SlashCommandBuilder()
 export const execute: executeCommand = async (interaction) => {
   const server_id = interaction.guild_id;
   const bot_id = interaction.application_id;
-  const user = interaction.user;
+  const user = interaction.user ?? interaction.member?.user;
 
   if (!user) {
     return {
       type: 4,
       data: {
-        content: `User not found. Try: ${interaction.member?.user.id} or ${interaction.user?.id}`,
+        content: `User not found.`,
       },
     };
   }
