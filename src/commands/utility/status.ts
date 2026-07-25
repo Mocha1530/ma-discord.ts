@@ -8,6 +8,7 @@ import { executeCommand } from "@/types";
 import { discord_api } from "@/utils/discord-api";
 import { MessageFlags } from "discord.js";
 import os from "os";
+import { formattedISODate } from "@/utils/formatDate";
 
 export const register = new SlashCommandBuilder()
   .setName("status")

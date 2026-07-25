@@ -21,3 +21,5 @@ function formattedISODate(date: Date): string {
 
   return `${year}-${month}-${day} ${hour}:${minute}:${second} (GMT+08)`;
 }
+
+export { formattedISODate };
