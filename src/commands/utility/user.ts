@@ -34,7 +34,7 @@ export const execute: executeCommand = async (interaction) => {
 
   const member = interaction.member;
   const accountAge = formatAccountAge(snowflakeToDate(user?.id!));
-  const badges = getBadges(user?.flags);
+  const badges = getBadges(user?.flags ?? user.public_flags ?? 0);
 
   let roleDisplay = "_No Roles_";
   if (server_id && member?.roles) {
@@ -85,9 +85,9 @@ export const execute: executeCommand = async (interaction) => {
           new ThumbnailBuilder()
             .setURL(
               member?.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${member.avatar}.${member.avatar.startsWith("a_") ? ".gif" : ".png"}?size=512`
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${member.avatar}.${member.avatar.startsWith("a_") ? "gif" : "png"}?size=512`
                 : user?.avatar
-                  ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? ".gif" : ".png"}?size=512`
+                  ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=512`
                   : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user?.id) >> 22n) % 6n}.png?size=512`,
             )
             .setDescription("User Icon"),
@@ -100,7 +100,7 @@ export const execute: executeCommand = async (interaction) => {
       new MediaGalleryBuilder().addItems(
         new MediaGalleryItemBuilder()
           .setURL(
-            `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${user.banner.startsWith("a_") ? ".gif" : ".png"}?size=1024`,
+            `https://cdn.discordapp.com/banners/${user.id}/${user.banner}.${user.banner.startsWith("a_") ? "gif" : "png"}?size=1024`,
           )
           .setDescription("User Banner"),
       ),
