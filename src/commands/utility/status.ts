@@ -36,13 +36,13 @@ export const execute: executeCommand = async (interaction) => {
   const vercelRegion = process.env.VERCEL_REGION || "local";
 
   const sla = await fetchUptime();
-  let uptimeSla = `\n**Uptime (Last 30 days)**`;
+  let uptimeSla = `\n\n**Uptime (Last 30 days)**`;
   if (sla) {
     uptimeSla =
       uptimeSla +
-      `\n- **Availability:** \`${sla.availability.toFixed(2)}%\`\n- **Downtime:** \`${sla.total_downtime} seconds\`\n- **Incidents:** \`${sla.number_of_incidents}\`\n- **Longest Incident:** \`${sla.longest_incident} seconds\``;
+      `\n> **Availability:** \`${sla.availability.toFixed(2)}%\`\n> **Downtime:** \`${sla.total_downtime} seconds\`\n> **Incidents:** \`${sla.number_of_incidents}\`\n> **Longest Incident:** \`${sla.longest_incident} seconds\``;
   } else {
-    uptimeSla = uptimeSla + "\n- Unavailable";
+    uptimeSla = uptimeSla + "\n> Unavailable";
   }
 
   const container = new ContainerBuilder()
@@ -55,7 +55,7 @@ export const execute: executeCommand = async (interaction) => {
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `>>> **Discord API Latency:** \`${apiLatency}ms\`\n**Instance Uptime:** \`${uptimeSeconds}s\`\n**Memory Usage (Process RSS):** \`${rssMB} MB\` used out of \`1024 MB\` limit\n**Heap (Used / Total):** \`${heapUsedMB} MB / ${heapTotalMB} MB\`\n**Host RAM:** \`${hostRamGB} GB\`\n**Server Region:** \`${vercelRegion}\`${uptimeSla}`,
+        `**Metrics**\n> **Discord API Latency:** \`${apiLatency}ms\`\n> **Instance Uptime:** \`${uptimeSeconds}s\`\n> **Memory Usage (Process RSS):** \`${rssMB} MB\` used out of \`1024 MB\` limit\n> **Heap (Used / Total):** \`${heapUsedMB} MB / ${heapTotalMB} MB\`\n> **Host RAM:** \`${hostRamGB} GB\`\n> **Server Region:** \`${vercelRegion}\`${uptimeSla}`,
       ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
@@ -76,7 +76,7 @@ export const execute: executeCommand = async (interaction) => {
 
 async function fetchUptime() {
   const monitorId = "4724536";
-  const apiKey = process.env.UPDATE_READ_KEY!;
+  const apiKey = process.env.UPTIME_READ_KEY!;
 
   if (!monitorId || !apiKey) {
     return null;
