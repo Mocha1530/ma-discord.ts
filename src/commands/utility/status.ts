@@ -7,6 +7,7 @@ import {
 import { executeCommand } from "@/types";
 import { discord_api } from "@/utils/discord-api";
 import { MessageFlags } from "discord.js";
+import os from "os";
 
 export const register = new SlashCommandBuilder()
   .setName("status")
@@ -19,7 +20,11 @@ export const execute: executeCommand = async (interaction) => {
   const apiLatency = Date.now() - start;
 
   // This the collects serverless metrics
-  const memoryUsage = process.memoryUsage();
+  const memory = process.memoryUsage();
+  const rssMB = (memory.rss / 1024 / 1024).toFixed(2);
+  const heapUsedMB = (memory.heapUsed / 1024 / 1024).toFixed(2);
+  const heapTotalMB = (memory.heapTotal / 1024 / 1024).toFixed(2);
+  const hostRamGB = (os.totalmem() / 1024 / 1024 / 1024).toFixed(2);
   const uptimeSeconds = Math.floor(process.uptime());
   const vercelRegion = process.env.VERCEL_REGION || "local";
 
@@ -33,7 +38,7 @@ export const execute: executeCommand = async (interaction) => {
     )
     .addTextDisplayComponents(
       new TextDisplayBuilder().setContent(
-        `>>> **Discord API Latency:** \`${apiLatency}ms\`\n**Instance Uptime:** \`${uptimeSeconds}\`\n**Heap Memory:** \`${(memoryUsage.heapUsed / 1024 / 1024).toFixed(2)} MB\`\n**Server Region:** \`${vercelRegion}\``,
+        `>>> **Discord API Latency:** \`${apiLatency}ms\`\n**Instance Uptime:** \`${uptimeSeconds}s\`\n**Memory Usage (Process RSS)** \`${rssMB} MB\` used out of \`1024 MB\` limit\n**Heap (Used / Total):** \`${heapUsedMB} MB / ${heapTotalMB} MB\`\n**Host RAM:** \`${hostRamGB} GB\`\n**Server Region:** \`${vercelRegion}\``,
       ),
     )
     .addSeparatorComponents(new SeparatorBuilder().setDivider(false))
