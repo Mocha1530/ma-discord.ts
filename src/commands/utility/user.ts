@@ -21,9 +21,18 @@ export const register = new SlashCommandBuilder()
 export const execute: executeCommand = async (interaction) => {
   const server_id = interaction.guild_id;
   const bot_id = interaction.application_id;
-  const user = interaction.user!;
+  const user = interaction.user;
+
+  if (!user) {
+    return {
+      type: 4,
+      data: {
+        content: `User not found. Try: ${interaction.member?.user.id} or ${interaction.user?.id}`,
+      },
+    };
+  }
+
   const member = interaction.member;
-  // const fullMember = await interaction.guild!.members.fetch(user.id);
   const accountAge = formatAccountAge(snowflakeToDate(user?.id!));
   const badges = getBadges(user?.flags);
 
@@ -69,7 +78,7 @@ export const execute: executeCommand = async (interaction) => {
         )
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### Extra\n>>> **Badges:** ${getBadges.length ? badges.join(", ") : "_No Badges_"}\n**Roles:** ${roleDisplay}`,
+            `### Extra\n>>> **Badges:** ${badges.length ? badges.join(", ") : "_No Badges_"}\n**Roles:** ${roleDisplay}`,
           ),
         )
         .setThumbnailAccessory(
