@@ -1,12 +1,13 @@
 import {
   ContainerBuilder,
+  MessageFlags,
   SeparatorBuilder,
   SlashCommandBuilder,
   TextDisplayBuilder,
-} from "@discordjs/builders";
+  type APIInteraction,
+} from "discord.js";
 import { executeCommand } from "@/types";
 import { discord_api } from "@/utils/discord-api";
-import { MessageFlags } from "discord.js";
 import os from "os";
 import { formattedISODate } from "@/utils/formatDate";
 import axios from "axios";
@@ -15,7 +16,7 @@ export const register = new SlashCommandBuilder()
   .setName("status")
   .setDescription("description of your command");
 
-export const execute: executeCommand = async (interaction) => {
+export const execute: executeCommand = async (interaction: APIInteraction) => {
   // This part gets API latency
   let apiLatency = 0;
   try {

@@ -8,6 +8,7 @@ import {
   SlashCommandBuilder,
   TextDisplayBuilder,
   ThumbnailBuilder,
+  type APIInteraction,
 } from "discord.js";
 import { formatAccountAge } from "@/utils/formatAccountAge";
 import { snowflakeToDate, getBadges } from "@/utils/user-helpers";
@@ -18,7 +19,7 @@ export const register = new SlashCommandBuilder()
   .setName("user")
   .setDescription("Provides information about the user.");
 
-export const execute: executeCommand = async (interaction) => {
+export const execute: executeCommand = async (interaction: APIInteraction) => {
   const server_id = interaction.guild_id;
   const bot_id = interaction.application_id;
   const user_id = interaction.user ?? interaction.member?.user.id;
