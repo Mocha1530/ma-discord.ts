@@ -1,4 +1,4 @@
-import * as help from "./help";
+import * as help from "./utility/help";
 import * as ping from "./ping";
 import * as user from "./utility/user";
 import * as status from "./utility/status";

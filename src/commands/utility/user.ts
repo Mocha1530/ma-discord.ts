@@ -77,22 +77,22 @@ export const execute: executeCommand = async (interaction: APIInteraction) => {
         )
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### User Info\n>>> **Username:** \`${user?.username}\`\n**Global Name:** \`${user?.global_name}\`\n**User ID:** \`${user?.id}\`\n**Account Created:** ${accountAge}`,
+            `**User Info**\n>>> **Username:** \`${user?.username}\`\n**Global Name:** \`${user?.global_name}\`\n**User ID:** \`${user?.id}\`\n**Account Created:** ${accountAge}`,
           ),
         )
         .addTextDisplayComponents(
           new TextDisplayBuilder().setContent(
-            `### Extra\n>>> **Badges:** ${badges.length ? badges.join(", ") : "_No Badges_"}\n**Roles:** ${roleDisplay}`,
+            `**Extra**\n>>> **Badges:** ${badges.length ? badges.join(", ") : "_No Badges_"}\n**Roles:** ${roleDisplay}`,
           ),
         )
         .setThumbnailAccessory(
           new ThumbnailBuilder()
             .setURL(
               member?.avatar
-                ? `https://cdn.discordapp.com/avatars/${user.id}/${member.avatar}.${member.avatar.startsWith("a_") ? "gif" : "png"}?size=512`
+                ? `https://cdn.discordapp.com/avatars/${user.id}/${member.avatar}.${member.avatar.startsWith("a_") ? "gif" : "png"}?size=1024`
                 : user?.avatar
-                  ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=512`
-                  : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user?.id) >> 22n) % 6n}.png?size=512`,
+                  ? `https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.${user.avatar.startsWith("a_") ? "gif" : "png"}?size=1024`
+                  : `https://cdn.discordapp.com/embed/avatars/${(BigInt(user?.id) >> 22n) % 6n}.png?size=1024`,
             )
             .setDescription("User Icon"),
         ),
